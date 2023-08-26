@@ -5,6 +5,7 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import * as z from 'zod';
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import OpenAI from "openai";    
 import axios from "axios";
 
 
@@ -13,6 +14,11 @@ import { formSchema } from "./constants";
 import { Form, FormControl, FormField, FormItem } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Empty } from "@/components/empty";
+import { Loader } from "@/components/Loader";
+import { cn } from "@/lib/utils";
+import { UserAvatar } from "@/components/user-avatar";
+import { BotAvatar } from "@/components/bot-avatar";
 
 
 const ConversationPage = () => {
@@ -26,13 +32,18 @@ const ConversationPage = () => {
     });
 
     const isLoading = form.formState.isSubmitting;
-    const [messages,setMessages] = useState("");
+    const [messages,setMessages] = useState<OpenAI.Chat.ChatCompletionMessage[]>([]);
     const onSubmit =async (values: z.infer<typeof formSchema>) => {
         try {
-            setMessages(values.prompt);
-            const pageRes = await axios.post('/api/conversation',{values})
-            const responce = JSON.parse(pageRes.data);
+            let message:OpenAI.Chat.ChatCompletionMessage={
+                content: values.prompt,
+                role: "user"
+            };
+            setMessages((current)=>[...current,message])
+            const pageRes = await axios.post('/api/conversation',{message})
+            const responce:OpenAI.Chat.ChatCompletion = await pageRes.data;
             console.log(responce);
+            setMessages((current)=>[...current,responce.choices[0].message]);
             form.reset()
             
         } catch (error:any) {
@@ -90,7 +101,25 @@ const ConversationPage = () => {
                     </Form>
                 </div>
                 <div className="space-y-4 mt-4">
-                    Messages Content 
+                    {isLoading && (<div className="p-8 rounded-lg w-full flex items-center justify-center bg-muted">
+                        <Loader />
+                    </div>)}
+                    {messages.length === 0 && !isLoading && (
+                        <div>
+                            <Empty label="No conversation started.."/>
+                        </div>
+                    )}
+                    <div className="flex flex-col-reverse gap-y-4">
+                        {messages.map((message)=>(
+                            <div 
+                            key={message.content}
+                            className={cn("p-8 w-full flex items-start gap-x-8 rounded-lg",message.role === 'user' ? "bg-white border border-black/10":"bg-muted")}
+                            >
+                                {message.role === "user" ? <UserAvatar /> : <BotAvatar />}
+                                <p className="text-sm">{message.content}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
