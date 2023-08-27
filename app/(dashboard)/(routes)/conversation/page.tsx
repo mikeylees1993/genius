@@ -42,7 +42,6 @@ const ConversationPage = () => {
             setMessages((current)=>[...current,message])
             const pageRes = await axios.post('/api/conversation',{message})
             const responce:OpenAI.Chat.ChatCompletion = await pageRes.data;
-            console.log(responce);
             setMessages((current)=>[...current,responce.choices[0].message]);
             form.reset()
             
