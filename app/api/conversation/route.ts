@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { StatusCodes } from "http-status-codes";
 import openai from 'openai';
 export async function POST(req:Request) {
     try {
@@ -9,7 +10,11 @@ export async function POST(req:Request) {
         const apiKey = process.env.OPENAI_API_KEY||"unknown";
         if(!userId)
         {
-            return new NextResponse("Unauthorized" , {status:401});
+            return new NextResponse("Unauthorized" , {status:StatusCodes.UNAUTHORIZED});
+        }
+        if (!message)
+        {
+          return new NextResponse("Prompt is required ",{status:StatusCodes.BAD_REQUEST})
         }
         const options = 
            {

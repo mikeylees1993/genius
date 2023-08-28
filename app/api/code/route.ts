@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs";
 import { NextResponse } from "next/server";
+import { StatusCodes } from "http-status-codes";
 import openai from "openai";
 
 export async function POST(req:Request)
@@ -13,11 +14,11 @@ export async function POST(req:Request)
     }
     if(!userId)
     {
-        return new NextResponse("Unauthorized ",{status:401});
+        return new NextResponse("Unauthorized ",{status:StatusCodes.UNAUTHORIZED});
     }
     if (!codePrompt)
     {
-        return new NextResponse("Code Prompt is a required field...",{status:500})
+        return new NextResponse("Code Prompt is a required field...",{status:StatusCodes.BAD_REQUEST})
     }
     try{
         const options = {
@@ -38,7 +39,7 @@ export async function POST(req:Request)
         );
         const data: openai.Chat.ChatCompletion = await res.json();
         const value = JSON.stringify(data);
-        return new NextResponse(value, { status: 200 });
+        return new NextResponse(value, { status: StatusCodes.OK });
     }catch(error:any){
         return new NextResponse("Internal Error ", {status:500});
     }
