@@ -43,7 +43,9 @@ const CodePage = () =>{
             console.log(res);
             form.reset()
         }catch (error:any) {
-            console.log(["[]"])
+            console.log("[CODE Error ]-", error)
+        }finally{
+            router.refresh();
         }
     }
     const isLoading = form.formState.isSubmitting;
