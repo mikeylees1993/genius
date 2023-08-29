@@ -20,7 +20,7 @@ export default function RootLayout({
       <html lang="en">
 
         <body className={inter.className}>{children}
-        <script src="https://kit.fontawesome.com/775c254438.js" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/775c254438.js"  defer></script>
         </body>
       </html>
   </ClerkProvider>
