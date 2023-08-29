@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-
+          {/* fixed liniting error */}
         <body className={inter.className}>{children}
         <script src="https://kit.fontawesome.com/775c254438.js"  defer></script>
         </body>
